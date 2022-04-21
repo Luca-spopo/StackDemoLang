@@ -1,0 +1,23 @@
+{
+  "name": "stack_demo_lang_runtime",
+  "version": "0.0.1",
+  "description": "javascript runtime to run programs written in StackDemoLang",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/Luca-spopo/StackDemoLang.git"
+  },
+  "author": "Anirudh Katoch",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Luca-spopo/StackDemoLang/issues"
+  },
+  "homepage": "https://github.com/Luca-spopo/StackDemoLang#readme",
+  "dependencies": {
+    "antlr4": "^4.10.1"
+  }
+}
