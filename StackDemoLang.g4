@@ -5,10 +5,10 @@ program
     ;
 
 procedure
-    : 'define_procedure' procedure_WORD contract body
+    : 'define_procedure' procedure_name contract body
     ;
 
-procedure_WORD
+procedure_name
     : WORD
     ;
 
@@ -63,7 +63,7 @@ compound_statement
     ;
 
 if_statement
-    : 'if' '0' '==' register_arg block ('else' (block | if_statement))?
+    : 'if' ZERO '==' register_arg block ('else' (block | if_statement))?
     ;
 
 block
@@ -149,13 +149,16 @@ BraceOpen: '{' ;
 BraceClose: '}' ;
 
 WORD
-    : [a-zA-Z_][a-zA-Z_0-9]*
+    : [a-zA-Z_0-9]+
     ;
 
 fragment
 Digit
-    : [0-9]
+    : [1-9]
+    | ZERO
     ;
+
+ZERO: '0' ;
 
 WS
     : [ \t\u000C\r\n]+ -> skip
