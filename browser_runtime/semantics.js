@@ -1,9 +1,6 @@
 import StackDemoLangListener from './StackDemoLangListener.js';
 import StackDemoLangParser from './StackDemoLangParser.js';
 import { ThunkGenerators } from './interpreter.js';
-import util from 'util'
-
-const DONT_CARE = {}
 
 class Instruction
 {
@@ -80,8 +77,6 @@ export default class StackDemoLangTranspilingVisitor
             program.procedures.push(procedure)
             program.instructions = program.instructions.concat(instructions)
         }
-        console.log("Program's semantics were parsed as follows:")
-        console.log(util.inspect(program, {showHidden: false, depth: null, colors: true}))
         return program
     }
 

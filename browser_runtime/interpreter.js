@@ -1,5 +1,6 @@
 import { showUserOutput, getUserInput } from "./io.js"
-import util from 'util'
+
+const DONT_CARE = {}
 
 export class ExecutionContext
 {
@@ -230,6 +231,15 @@ export class Thread
             this.executionContext.instructionPointer = instruction.lineNumber + 1
             console.log(`\n>> Executing instruction ${instruction.lineNumber}: ${instruction.text}`)
             await instruction.thunk(this.executionContext)    
+            console.log(`stack:`)
+            if(this.executionContext.stack.length > 0)
+            {
+                console.log(`${this.executionContext.stack.map((element) => `${element.value} (${element.helpfulName})\n`).join("")}`)
+            }
+            else
+            {
+                console.log("<Stack is empty>\n")
+            }
             console.log(`registers:`)
             let registers = this.executionContext.registers
             for(let registerIndex in registers)
@@ -237,7 +247,10 @@ export class Thread
                 let element = registers[registerIndex]
                 console.log(`R${registerIndex} : ${element.value} (${element.helpfulName})`)
             }
-            console.log(`stack:\n${this.executionContext.stack.map((element) => `${element.value} (${element.helpfulName})`).join("\n")}`)
+        }
+        else
+        {
+            this.executionContext.startUndefinedBehavior("Instruction pointer went outside the program bounds")
         }
     }
 }

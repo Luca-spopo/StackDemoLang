@@ -4,9 +4,12 @@ import StackDemoLangParser from './StackDemoLangParser.js';
 import StackDemoLangTranspilingVisitor from './semantics.js';
 import { ExecutionContext, HiddenCallStackFrame, Thread } from './interpreter.js';
 import { showUserOutput } from './io.js';
+import util from 'util'
 
 async function runProgram(input)
 {
+    console.log("Parsing program...")
+    console.log(input)
     const chars = new antlr4.InputStream(input);
     const lexer = new StackDemoLangLexer(chars);
     const tokens = new antlr4.CommonTokenStream(lexer);
@@ -14,6 +17,9 @@ async function runProgram(input)
     parser.buildParseTrees = true;
     const tree = parser.program();
     let program = tree.accept(new StackDemoLangTranspilingVisitor())
+    console.log("Program's semantics were parsed as follows:")
+    console.log(util.inspect(program, {showHidden: false, depth: null, colors: true}))
+
     let mainProcedure = program.procedures.find((procedure) => { return procedure.name.toLowerCase() == "main" })
     if(mainProcedure)
     {
@@ -41,8 +47,8 @@ contract
 }
 body
 {
-    input (as number_to_add_1)
-    input (as number_to_add_2)
+    input
+    input
 
     registers[0] = stack.pop() (as number_to_average_1)
     registers[1] = stack.pop() (as number_to_average_2)
