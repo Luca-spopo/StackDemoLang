@@ -17,16 +17,18 @@ antlr4 -Dlanguage=JavaScript ./StackDemoLang.g4 -o browser_runtime
 ```
 (This will generate a lexer and parser in javascript)
 
-# Runtime
-
-A runtime to leverage the generated lexer and parser code can be downloaded from the ANTLR website, or from NPM
+These generated files have dependencies on the common lexing and parsing runtime provided by ANTLR
+This runtime for the parser can be downloaded from the ANTLR website, or from NPM
 
 e.g. `wget http://www.antlr.org/download/antlr-javascript-runtime-4.10.1.zip`
 or `npm i antlr4`
 
 The package StackDemoLangRuntime already has antlr4 as a dependency
 
-The runtime is meant to be run with nodeJS locally
+# Language runtime
+
+The language runtime is written in javascript as well (in interpreter.js) to be run with nodeJS locally
+
 It can also be run on a browser using webpack.
 
 # Building
@@ -47,7 +49,7 @@ grun()
 antlr4 ./StackDemoLang.g4 -o java && (cd java ; javac *.java ; grun StackDemoLang program -tokens -gui -tree ../examples/example_program.stackdemo)
 ```
 
-The way to debug the semantic parser and interpreter build on top of antlr, is to debug nodeJS
+The way to debug the semantic parser and interpreter, is to debug via nodeJS + chrome devTools
 ```
 antlr4 -Dlanguage=JavaScript ./StackDemoLang.g4 -o browser_runtime
 ( cd browser_runtime ; node inspect . )
