@@ -21,23 +21,27 @@ body
     ;
 
 contract_rule
+    : stack_promise
+    | save_register_promise_except
+    ;
+
+stack_promise
     : push_and_pop_stack_promise
     | push_only_stack_promise
     | pop_only_stack_promise
-    | save_register_promise_except
     ;
 
 
 push_and_pop_stack_promise
-    : 'I promise to pop' WHOLE_NUMBER elements contract_description? 'and push' WHOLE_NUMBER elements contract_description? 'on the stack'
+    : 'I promise to pop' pop_contract_count elements contract_description? 'and push' push_contract_count elements contract_description? 'on the stack'
     ;
 
 push_only_stack_promise
-    : 'I promise to pop' 'no' elements 'and push' WHOLE_NUMBER elements contract_description? 'on the stack'
+    : 'I promise to pop' 'no' elements 'and push' push_contract_count elements contract_description? 'on the stack'
     ;
 
 pop_only_stack_promise
-    : 'I promise to pop' WHOLE_NUMBER elements contract_description? 'and push' 'no' elements 'on the stack'
+    : 'I promise to pop' pop_contract_count elements contract_description? 'and push' 'no' elements 'on the stack'
     ;
 
 save_register_promise_except
@@ -46,6 +50,14 @@ save_register_promise_except
 
 contract_description
     : '(' WORD+ ')'
+    ;
+
+pop_contract_count
+    : WHOLE_NUMBER
+    ;
+
+push_contract_count
+    : WHOLE_NUMBER
     ;
 
 elements
@@ -116,7 +128,7 @@ input_statement
     ;
 
 print_statement
-    : 'print' register_arg
+    : 'print' register_arg informal_label
     ;
 
 jump_to_statement

@@ -38,11 +38,17 @@ antlr4 -Dlanguage=JavaScript ./StackDemoLang.g4 -o browser_runtime
 
 # Debugging
 
-Easiest way to debug the parser is using the antlr test rig
+Easiest way to debug the grammar is using the antlr test rig
 ```
 grun()
 {
    java -Xmx500M -cp "/usr/local/lib/antlr-4.10.1-complete.jar:$CLASSPATH" org.antlr.v4.gui.TestRig "$@"
 }
 antlr4 ./StackDemoLang.g4 -o java && (cd java ; javac *.java ; grun StackDemoLang program -tokens -gui -tree ../examples/example_program.stackdemo)
+```
+
+The way to debug the semantic parser and interpreter build on top of antlr, is to debug nodeJS
+```
+antlr4 -Dlanguage=JavaScript ./StackDemoLang.g4 -o browser_runtime
+( cd browser_runtime ; node inspect . )
 ```
