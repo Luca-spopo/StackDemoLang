@@ -25,7 +25,7 @@ class Program
     instructionAt(lineNumber)
     {
         var candidateInstruction = null
-        for(instruction in this.instructions)
+        for(let instruction of this.instructions)
         {
             if(instruction.lineNumber == lineNumber)
             {

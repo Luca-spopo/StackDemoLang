@@ -1,11 +1,32 @@
+import { showUserOutput, getUserInput } from "./io.js"
+import util from 'util'
+
 export class ExecutionContext
 {
-    constructor()
+    constructor(registerCount)
     {
         this.registers = []
+        for(let i=0; i<registerCount; i++)
+        {
+            this.registers.push(new RegisterElement(Math.floor(Math.random() * 65025), "junk_value"))
+        }
+        this.registerCount = registerCount
         this.stack = []
         this.hiddenCallStack = []
         this.instructionPointer = 0
+    }
+    startUndefinedBehavior(reason)
+    {
+        //TODO: Make UI have warnings about UB, along with the reason
+    }
+}
+
+export class HiddenCallStackFrame
+{
+    constructor(procedure)
+    {
+        this.procedure = procedure
+        this.invocationId = Math.floor(Math.random()*999)
     }
 }
 
@@ -123,7 +144,15 @@ export class ThunkGenerators
         return async function(executionContext)
         {
             let stackElement = executionContext.stack.pop()
-            executionContext.registers[registerIndex] = new RegisterElement(stackElement.value, helpfulName, _latestProcedure(executionContext))
+            if(stackElement)
+            {
+                executionContext.registers[registerIndex] = new RegisterElement(stackElement.value, helpfulName, _latestProcedure(executionContext))
+            }
+            else
+            {
+                executionContext.startUndefinedBehavior("Reached the bottom of the stack")
+                executionContext.registers[registerIndex] = new RegisterElement(Math.floor(Math.random() * 65025), helpfulName, _latestProcedure(executionContext))
+            }
         }
     }
 
@@ -131,7 +160,7 @@ export class ThunkGenerators
     {
         return async function(executionContext)
         {
-            executionContext.stack.push(new StackElement(executionContext.registers[registerIndex], helpfulName, _latestProcedure(executionContext)))
+            executionContext.stack.push(new StackElement(executionContext.registers[registerIndex].value, helpfulName, _latestProcedure(executionContext)))
         }
     }
 
@@ -195,8 +224,20 @@ export class Thread
     }
     async tick()
     {
-        let instruction = program.instructionAt(this.executionContext.instructionPointer)
-        this.executionContext.instructionPointer++
-        await instruction.thunk()
+        let instruction = this.program.instructionAt(this.executionContext.instructionPointer)
+        if(instruction)
+        {
+            this.executionContext.instructionPointer = instruction.lineNumber + 1
+            console.log(`\n>> Executing instruction ${instruction.lineNumber}: ${instruction.text}`)
+            await instruction.thunk(this.executionContext)    
+            console.log(`registers:`)
+            let registers = this.executionContext.registers
+            for(let registerIndex in registers)
+            {
+                let element = registers[registerIndex]
+                console.log(`R${registerIndex} : ${element.value} (${element.helpfulName})`)
+            }
+            console.log(`stack:\n${this.executionContext.stack.map((element) => `${element.value} (${element.helpfulName})`).join("\n")}`)
+        }
     }
 }
