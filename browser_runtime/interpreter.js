@@ -28,18 +28,18 @@ class StackInvariant extends Invariant
 {
     constructor(expectedStackPrefix, expectedStackCount)
     {
-        assert(expectedStackCount >= expectedStackPrefix.count)
+        assert(expectedStackCount >= expectedStackPrefix.length)
         this.expectedStackPrefix = expectedStackPrefix
         this.expectedStackCount = expectedStackCount
     }
     check(execution_context)
     {
-        if(execution_context.stack.count != this.expectedStackCount)
+        if(execution_context.stack.length != this.expectedStackCount)
         {
             return false
         }
 
-        for(element_index = 0 ; element_index < this.expectedStackPrefix.count ; element_index++)
+        for(element_index = 0 ; element_index < this.expectedStackPrefix.length ; element_index++)
         {
             if(execution_context.stack[element_index] != this.expectedStackPrefix[element_index])
             {
@@ -59,7 +59,7 @@ class RegisterInvariant extends Invariant
     }
     check(execution_context)
     {
-        for(element_index = 0 ; element_index < this.expectedRegisters.count ; element_index++)
+        for(element_index = 0 ; element_index < this.expectedRegisters.length ; element_index++)
         {
             if(this.expectedRegisters[element_index] != DONT_CARE) {
                 if(execution_context.registers[element_index] != this.expectedRegisters[element_index])
@@ -183,5 +183,20 @@ export class ThunkGenerators
         {
             executionContext.instructionPointer = executionContext.registers[registerIndex]
         }
+    }
+}
+
+export class Thread
+{
+    constructor(program, executionContext)
+    {
+        this.program = program
+        this.executionContext = executionContext
+    }
+    async tick()
+    {
+        let instruction = program.instructionAt(this.executionContext.instructionPointer)
+        this.executionContext.instructionPointer++
+        await instruction.thunk()
     }
 }

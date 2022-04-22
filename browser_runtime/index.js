@@ -11,9 +11,7 @@ function runProgram(input)
     const parser = new StackDemoLangParser(tokens);
     parser.buildParseTrees = true;
     const tree = parser.program();
-    tree.accept(new StackDemoLangTranspilingVisitor())
-    // const transpiler = new StackDemoLangTranspilingListener();
-    // antlr4.tree.ParseTreeWalker.DEFAULT.walk(transpiler, tree);
+    let program = tree.accept(new StackDemoLangTranspilingVisitor())
 }
 
 runProgram(`

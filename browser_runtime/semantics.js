@@ -1,6 +1,7 @@
 import StackDemoLangListener from './StackDemoLangListener.js';
 import StackDemoLangParser from './StackDemoLangParser.js';
 import { ThunkGenerators } from './interpreter.js';
+import util from 'util'
 
 const DONT_CARE = {}
 
@@ -19,6 +20,26 @@ class Program
     constructor()
     {
         this.procedures = []
+        this.instructions = []
+    }
+    instructionAt(lineNumber)
+    {
+        var candidateInstruction = null
+        for(instruction in this.instructions)
+        {
+            if(instruction.lineNumber == lineNumber)
+            {
+                return instruction
+            }
+            if(instruction.lineNumber > lineNumber)
+            {
+                if(candidateInstruction == null || instruction.lineNumber < candidateInstruction.lineNumber)
+                {
+                    candidateInstruction = instruction
+                }
+            }
+        }
+        return candidateInstruction
     }
 }
 
@@ -52,27 +73,27 @@ export default class StackDemoLangTranspilingVisitor
 
     visitProgram(ctx)
     {
-        if (ctx.children) {
-            let procedures = ctx.procedure(null)
-            .map(child => {
-                return this.visitProcedure(child)
-            });
-            let program = new Program()
-            program.procedures = procedures
-            console.log("<LUCA:>", program, "</LUCA:>")
-            return program 
+        let program = new Program()
+        for(let procedureCtx of ctx.procedure(null))
+        {
+            let [procedure, instructions] = this.visitProcedure(procedureCtx)
+            program.procedures.push(procedure)
+            program.instructions = program.instructions.concat(instructions)
         }
+        console.log("Program's semantics were parsed as follows:")
+        console.log(util.inspect(program, {showHidden: false, depth: null, colors: true}))
+        return program
     }
 
     visitProcedure(ctx)
     {
         let name = ctx.procedure_name().getText()
-        let address = ctx.start.line
         let contracts = this.visitProcedureContracts(ctx.contract())
-        let body = this.visitProcedureBody(ctx.body())
+        let instructions = this.visitProcedureBody(ctx.body())
+        let address = instructions.length > 0 ? instructions[0].lineNumber : ctx.body().start.line
         let procedure = new Procedure(name, address)
         procedure.contracts = contracts
-        return procedure
+        return [procedure, instructions]
     }
 
     visitProcedureContracts(ctx)
@@ -225,6 +246,6 @@ export default class StackDemoLangTranspilingVisitor
             }
         }
 
-        return new Instruction(simpleStatementCtx.start.line, simpleStatementCtx.getText(), thunk)
+        return new Instruction(simpleStatementCtx.start.line, simpleStatementCtx.start.getInputStream().getText(simpleStatementCtx.start.start, simpleStatementCtx.stop.stop), thunk)
     }
 }
