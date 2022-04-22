@@ -131,7 +131,7 @@ const _divideThunk = async function(executionContext)
 const _inputThunk = async function(executionContext)
 {
     var inputInteger = NaN
-    while(inputInteger == NaN) {
+    while(isNaN(inputInteger)) {
         inputInteger = parseInt(await getUserInput("Please enter a whole number"))
     }
     executionContext.stack.push(new StackElement(inputInteger, "user_input", _latestProcedure(executionContext)))

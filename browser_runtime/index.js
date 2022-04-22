@@ -41,8 +41,8 @@ contract
 }
 body
 {
-    stack.push(20) (as number_to_add_1)
-    stack.push(30) (as number_to_add_2)
+    input (as number_to_add_1)
+    input (as number_to_add_2)
 
     registers[0] = stack.pop() (as number_to_average_1)
     registers[1] = stack.pop() (as number_to_average_2)

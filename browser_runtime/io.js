@@ -1,3 +1,6 @@
+import readline from "readline"
+import process from "process"
+
 export async function getUserInput(promptText)
 {
     if(globalThis.window && window.prompt)
@@ -7,11 +10,11 @@ export async function getUserInput(promptText)
 
     if(globalThis.process && process.stdin)
     {
-        const readline = require("readline/promises")
-
         const rl = readline.createInterface({ input: process.stdin, output: process.stdout })
 
-        const answer = await rl.question(promptText)
+        const answer = await new Promise(resolve => {
+            rl.question(`${promptText}: `, resolve)
+          })
 
         rl.close()
         
