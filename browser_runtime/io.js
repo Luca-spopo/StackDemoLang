@@ -1,11 +1,11 @@
 export async function getUserInput(promptText)
 {
-    if(window?.prompt)
+    if(globalThis.window && window.prompt)
     {
         return window.prompt(promptText)
     }
 
-    if(process?.stdin)
+    if(globalThis.process && process.stdin)
     {
         const readline = require("readline/promises")
 
@@ -21,5 +21,12 @@ export async function getUserInput(promptText)
 
 export async function showUserOutput(text)
 {
-    return window.alert(text)
+    if(globalThis.window && window.alert)
+    {
+        return window.alert(text)
+    }
+    else
+    {
+        return console.log(text)
+    }
 }

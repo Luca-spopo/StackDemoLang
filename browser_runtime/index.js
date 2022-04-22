@@ -2,8 +2,10 @@ import antlr4 from 'antlr4';
 import StackDemoLangLexer from './StackDemoLangLexer.js';
 import StackDemoLangParser from './StackDemoLangParser.js';
 import StackDemoLangTranspilingVisitor from './semantics.js';
+import { ExecutionContext, Thread } from './interpreter.js';
+import { showUserOutput } from './io.js';
 
-function runProgram(input)
+async function runProgram(input)
 {
     const chars = new antlr4.InputStream(input);
     const lexer = new StackDemoLangLexer(chars);
@@ -12,9 +14,24 @@ function runProgram(input)
     parser.buildParseTrees = true;
     const tree = parser.program();
     let program = tree.accept(new StackDemoLangTranspilingVisitor())
+    let mainProcedure = program.procedures.find((procedure) => { return procedure.name.toLowerCase() == "main" })
+    if(mainProcedure)
+    {
+        let executionContext = ExecutionContext()
+        executionContext.instructionPointer = 0
+        let mainThread = Thread(program, executionContext)
+        while(true)
+        {
+            await mainThread.tick()
+        }
+    }
+    else
+    {
+        showUserOutput("There was no main function, not running the program")
+    }
 }
 
-runProgram(`
+await runProgram(`
 define_procedure
 average_of_2
 contract

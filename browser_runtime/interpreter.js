@@ -1,4 +1,4 @@
-class ExecutionContext
+export class ExecutionContext
 {
     constructor()
     {
