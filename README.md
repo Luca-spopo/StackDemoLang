@@ -27,7 +27,13 @@ The package StackDemoLangRuntime already has antlr4 as a dependency
 
 # Language runtime
 
-The language runtime is written in javascript as well (in interpreter.js) to be run with nodeJS locally
+The language runtime is a virtual machine written in javascript as well (in interpreter.js)
+
+This virtual machine is modelled after a generic CPU processor, with registers and a stack.
+
+It has some custom features to help visualization and aid conceptualization.
+
+The virtual machine, as well as the language interpreter, can be run with nodeJS locally
 
 It can also be run on a browser using webpack.
 
