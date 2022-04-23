@@ -1,4 +1,4 @@
-import { showUserOutput, getUserInput } from "./io.js"
+import { showUserOutput, getUserInput, dimOutput, resetOutputFormat } from "./io.js"
 
 const DONT_CARE = {}
 
@@ -239,7 +239,7 @@ export class Thread
             this.executionContext.instructionPointer = instruction.lineNumber + 1
             console.log(`\n>> Executing instruction ${instruction.lineNumber}: ${instruction.text}`)
             await instruction.thunk(this.executionContext)    
-            process.stdout.write('\x1b[2m')
+            dimOutput()
             console.log(`stack:`)
             if(this.executionContext.stack.length > 0)
             {
@@ -256,7 +256,7 @@ export class Thread
                 let element = registers[registerIndex]
                 console.log(`R${registerIndex} : ${element.value} (${element.helpfulName})`)
             }
-            process.stdout.write('\x1b[0m')
+            resetOutputFormat()
         }
         else
         {

@@ -23,6 +23,22 @@ export async function getUserInput(promptText)
     }
 }
 
+export function dimOutput()
+{
+    if(globalThis.process && process.stdout)
+    {
+        process.stdout.write('\x1b[2m')
+    }
+}
+
+export function resetOutputFormat()
+{
+    if(globalThis.process && process.stdout)
+    {
+        process.stdout.write('\x1b[0m')
+    }
+}
+
 export async function showUserOutput(text)
 {
     if(globalThis.window && window.alert)
