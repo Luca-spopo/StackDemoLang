@@ -1,5 +1,7 @@
 **/*.interp
 **/*.tokens
-browser_runtime/codegen
+browser_runtime/src/codegen
+browser_runtime/dist/main.js
+browser_runtime/dist/main.js.LICENSE.txt
 browser_runtime/node_modules
 java
