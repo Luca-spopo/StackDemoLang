@@ -82,10 +82,15 @@ compound_statement
 directive
     : statement
     | label_declaration
+    | macro_invocation
     ;
 
 label_declaration
     : '#' 'LABEL:' DOT WORD
+    ;
+
+macro_invocation
+    : '#' 'inline' procedure_name
     ;
 
 if_statement

@@ -55,15 +55,20 @@ class Procedure
     }
 }
 
+StackDemoLangParser.ProgramContext.prototype.getProcedureWithName = function(targetProcName)
+{
+    return this.procedure(null)?.find((procedureCtx) => {
+        return procedureCtx.procedure_name().getText() == targetProcName
+    })
+}
+
 StackDemoLangParser.Labelled_address_argContext.prototype.resolveAddress = function(programCtx, procedureCtx)
 {
     let procJumpArgCtx = this.proc_jump_arg()
     if(procJumpArgCtx)
     {
         let targetProcName = procJumpArgCtx.procedure_name().getText()
-        let targetProc = programCtx.procedure(null).find((procedureCtx) => {
-            return procedureCtx.procedure_name().getText() == targetProcName
-        })
+        let targetProc = programCtx.getProcedureWithName(targetProcName)
         if(targetProc)
         {
             return targetProc.getAddress()
@@ -197,10 +202,10 @@ export default class StackDemoLangTranspilingVisitor
         }) ?? []
     }
 
-    visitProcedureBody(ctx, programContext, procedureContext)
+    visitProcedureBody(ctx, programContext, procedureContext, macroExpansionHistory)
     {
         let blockCtx = ctx.block()
-        return this.produceInstructionsFromBlock(blockCtx, programContext, procedureContext)
+        return this.produceInstructionsFromBlock(blockCtx, programContext, procedureContext, macroExpansionHistory)
     }
 
     getRegisterIndexFromRegisterArg(registerArgCtx)
@@ -208,11 +213,12 @@ export default class StackDemoLangTranspilingVisitor
         return parseInt(registerArgCtx.WHOLE_NUMBER().getText())
     }
 
-    produceInstructionsFromBlock(blockCtx, programContext, procedureContext)
+    produceInstructionsFromBlock(blockCtx, programContext, procedureContext, macroExpansionHistory)
     {
         return blockCtx.directive(null).flatMap((directiveCtx) => {
             let statementCtx = directiveCtx.statement()
             let labelDeclarationCtx = directiveCtx.label_declaration()
+            let macroInvocationCtx = directiveCtx.macro_invocation()
             if(statementCtx)
             {
                 let simpleStatementCtx = statementCtx.simple_statement()
@@ -224,6 +230,18 @@ export default class StackDemoLangTranspilingVisitor
                 {
                     throw "Compound statements not supported yet by this parser"
                 }
+            }
+            else if(macroInvocationCtx)
+            {
+                let nameOfProcedureToCopy = macroInvocationCtx.procedure_name().getText()
+                let procedureToCopy = programContext.getProcedureWithName(nameOfProcedureToCopy)
+                macroExpansionHistory = macroExpansionHistory ?? []
+                if(macroExpansionHistory.includes(nameOfProcedureToCopy))
+                {
+                    throw "Circular reference encountered while expanding macros"
+                }
+                macroExpansionHistory.push(nameOfProcedureToCopy)
+                return this.visitProcedureBody(procedureToCopy.body(), programContext, procedureToCopy, macroExpansionHistory)
             }
             else if(labelDeclarationCtx)
             {
