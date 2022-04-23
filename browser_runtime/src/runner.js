@@ -1,10 +1,10 @@
 import antlr4 from 'antlr4';
-import StackDemoLangLexer from './StackDemoLangLexer.js';
-import StackDemoLangParser from './StackDemoLangParser.js';
+import StackDemoLangLexer from './codegen/StackDemoLangLexer.js';
+import StackDemoLangParser from './codegen/StackDemoLangParser.js';
 import StackDemoLangTranspilingVisitor from './semantics.js';
 import { ExecutionContext, HiddenCallStackFrame, Thread } from './interpreter.js';
 import { showUserOutput } from './io.js';
-import util from 'util'
+import inspect from 'browser-util-inspect'
 
 export async function runProgram(input)
 {
@@ -22,7 +22,7 @@ export async function runProgram(input)
     const tree = parser.program();
     let program = tree.accept(new StackDemoLangTranspilingVisitor())
     console.log("Program's semantics were parsed as follows:")
-    console.log(util.inspect(program, {showHidden: false, depth: null, colors: true}))
+    console.log(inspect(program, {showHidden: false, depth: null, colors: true}))
 
     let mainProcedure = program.procedures.find((procedure) => { return procedure.name.toLowerCase() == "main" })
     if(mainProcedure)

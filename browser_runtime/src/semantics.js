@@ -1,5 +1,4 @@
-import StackDemoLangListener from './StackDemoLangListener.js';
-import StackDemoLangParser from './StackDemoLangParser.js';
+import StackDemoLangParser from './codegen/StackDemoLangParser.js';
 import { ThunkGenerators } from './interpreter.js';
 
 class Instruction
