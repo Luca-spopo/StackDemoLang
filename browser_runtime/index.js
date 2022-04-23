@@ -9,7 +9,11 @@ import util from 'util'
 async function runProgram(input)
 {
     console.log("Parsing program...")
-    console.log(input)
+    let programLines = input.split("\n")
+    for(let lineNumber in programLines)
+    {
+        console.log(`${parseInt(lineNumber)+1}:\t`, programLines[lineNumber])
+    }
     const chars = new antlr4.InputStream(input);
     const lexer = new StackDemoLangLexer(chars);
     const tokens = new antlr4.CommonTokenStream(lexer);
@@ -39,32 +43,80 @@ async function runProgram(input)
 }
 
 await runProgram(`
-define_procedure main
+define_procedure average_of_2
 contract
 {
-    I promise to pop 2 elements (the numbers to average) and push 1 element (their average) on the stack
+    I promise to pop 3 elements (the numbers to average and the return address) and push 1 element (their average) on the stack
     I promise to preserve the value of all registers except: registers[0], registers[1]
 }
 body
 {
+    //Get the arguments (except the return address)
+    registers[0] = stack.pop() (as number_to_average_1)
+    registers[1] = stack.pop() (as number_to_average_2)
+
+    //Add the two numbers:
+        //Push the two numbers to the stack
+        stack.push(registers[1]) (as number_to_add_1)
+        stack.push(registers[0]) (as number_to_add_2)
+
+        //Process the two numbers on top of the stack
+        add
+
+        //Get the added value from the top of the stack
+        registers[0] = stack.pop() (as sum)
+
+    //Divide them by 2
+        //Push the divident and divisor
+        stack.push(registers[0]) (as sum)
+        stack.push(2) (as diviser)
+
+        //Process the two numbers at the top of the stack
+        divide
+
+        //Get the divided value
+        registers[0] = stack.pop() (as average)
+
+    //Get the return address send by the caller procedure
+    registers[1] = stack.pop() (as return_address)
+
+    //Push the average to the stack, as promised by our contract
+    stack.push(registers[0]) (as average)
+
+    //Jump to the return address the caller requested us to return to
+    jump to registers[1]
+}
+
+define_procedure main
+body
+{
+    #LABEL: .loopStart
+
     input
     input
 
     registers[0] = stack.pop() (as number_to_average_1)
     registers[1] = stack.pop() (as number_to_average_2)
 
-    stack.push(registers[1]) (as number_to_add_1)
-    stack.push(registers[0]) (as number_to_add_2)
-    add
-    registers[0] = stack.pop() (as sum)
+    //Average the numbers using a subroutine:
+        //Prepare the return address the subroutine should come back to after it's done:
+        stack.push(#.after_averaging_jump_here.lineNumber) (as address_to_return_to_after_procedure_call)
 
-    stack.push(registers[0]) (as sum)
-    stack.push(2) (as diviser)
-    divide
-    registers[0] = stack.pop() (as average)
+        //Prepare the arguments (the numbers to average) for the subroutine
+        stack.push(registers[1]) (as number_to_add_1)
+        stack.push(registers[0]) (as number_to_add_2)
 
+        //Jump to the subroutine
+        jump to #average_of_2.lineNumber
+        #LABEL: .after_averaging_jump_here
+
+        //Process the output of the subroutine, which it left for us on the stack
+        registers[0] = stack.pop() (as average)
+
+    //Print the output
     print registers[0] (as average)
 
-    stack.push(registers[0]) (as average)
+    jump to #.loopStart.lineNumber
+    //Or alternatively, jump to #main.lineNumber
 }
 `)

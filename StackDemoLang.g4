@@ -5,7 +5,7 @@ program
     ;
 
 procedure
-    : 'define_procedure' procedure_name contract body
+    : 'define_procedure' procedure_name contract? body
     ;
 
 procedure_name
@@ -22,42 +22,47 @@ body
 
 contract_rule
     : stack_promise
-    | save_register_promise_except
+    | register_promise
     ;
 
 stack_promise
     : push_and_pop_stack_promise
-    | push_only_stack_promise
-    | pop_only_stack_promise
+    | preserve_stack_promise
     ;
 
+register_promise
+    : save_register_promise_except
+    | save_all_registers_promise
+    ;
+
+preserve_stack_promise
+    : 'I promise to preserve the stack'
+    ;
 
 push_and_pop_stack_promise
     : 'I promise to pop' pop_contract_count elements contract_description? 'and push' push_contract_count elements contract_description? 'on the stack'
-    ;
-
-push_only_stack_promise
-    : 'I promise to pop' 'no' elements 'and push' push_contract_count elements contract_description? 'on the stack'
-    ;
-
-pop_only_stack_promise
-    : 'I promise to pop' pop_contract_count elements contract_description? 'and push' 'no' elements 'on the stack'
     ;
 
 save_register_promise_except
     : 'I promise to preserve the value of all registers except:' (register_arg COMMA?)* register_arg
     ;
 
+save_all_registers_promise
+    : 'I promise to preserve the value of all registers'
+    ;
+
 contract_description
-    : '(' WORD+ ')'
+    : '(' (WORD | ',' | '|')+ ')'
     ;
 
 pop_contract_count
     : WHOLE_NUMBER
+    | 'no'
     ;
 
 push_contract_count
     : WHOLE_NUMBER
+    | 'no'
     ;
 
 elements
@@ -74,16 +79,26 @@ compound_statement
     : if_statement
     ;
 
+directive
+    : statement
+    | label_declaration
+    ;
+
+label_declaration
+    : '#' 'LABEL:' DOT WORD
+    ;
+
 if_statement
     : 'if' ZERO '==' register_arg block ('else' (block | if_statement))?
     ;
 
 block
-    : BraceOpen statement+ BraceClose
+    : BraceOpen directive+ BraceClose
     ;
 
 simple_statement
     : push_from_statement
+    | push_address_statement
     | push_statement
     | pop_to_statement
     | add_statement
@@ -92,11 +107,16 @@ simple_statement
     | divide_statement
     | input_statement
     | print_statement
-    | jump_to_statement
+    | jump_to_register_statement
+    | jump_to_label_statement
     ;
 
 push_from_statement
     : 'stack' DOT 'push' '(' register_arg ')' informal_label
+    ;
+
+push_address_statement
+    : 'stack' DOT 'push' '(' labelled_address_arg ')' informal_label
     ;
 
 push_statement
@@ -131,8 +151,25 @@ print_statement
     : 'print' register_arg informal_label
     ;
 
-jump_to_statement
+jump_to_register_statement
     : 'jump to' register_arg
+    ;
+
+jump_to_label_statement
+    : 'jump to' labelled_address_arg
+    ;
+
+labelled_address_arg
+    : label_jump_arg
+    | proc_jump_arg
+    ;
+
+label_jump_arg
+    : '#' DOT WORD DOT 'lineNumber'
+    ;
+
+proc_jump_arg
+    : '#' procedure_name DOT 'lineNumber'
     ;
 
 register_arg
@@ -162,6 +199,18 @@ BraceClose: '}' ;
 
 WORD
     : [a-zA-Z_0-9]+
+    | 'no'
+    | 'lineNumber'
+    | 'add'
+    | 'subtract'
+    | 'multiply'
+    | 'divide'
+    | 'if'
+    | 'else'
+    | 'stack'
+    | 'element'
+    | 'elements'
+    | 'inline'
     ;
 
 fragment

@@ -126,13 +126,13 @@ const _divideThunk = async function(executionContext)
 {
     let rhs = executionContext.stack.pop().value
     let lhs = executionContext.stack.pop().value
-    executionContext.stack.push(new StackElement(lhs / rhs, "add_operation_result", _latestProcedure(executionContext)))
+    executionContext.stack.push(new StackElement(parseInt(lhs / rhs), "add_operation_result", _latestProcedure(executionContext)))
 }
 
 const _inputThunk = async function(executionContext)
 {
     var inputInteger = NaN
-    while(isNaN(inputInteger)) {
+    while(isNaN(inputInteger) || inputInteger < 0) {
         inputInteger = parseInt(await getUserInput("Please enter a whole number"))
     }
     executionContext.stack.push(new StackElement(inputInteger, "user_input", _latestProcedure(executionContext)))
@@ -202,16 +202,24 @@ export class ThunkGenerators
     {
         return async function(executionContext)
         {
-            let stackElement = executionContext.registers[registerIndex]
-            await showUserOutput(`Program Output: ${helpfulName} is ${stackElement.value}`)
+            let registerElement = executionContext.registers[registerIndex]
+            await showUserOutput(`Program Output: ${helpfulName} is ${registerElement.value}`)
         }
     }
 
-    static forJumpTo(registerIndex)
+    static forJumpToRegister(registerIndex)
     {
         return async function(executionContext)
         {
-            executionContext.instructionPointer = executionContext.registers[registerIndex]
+            executionContext.instructionPointer = executionContext.registers[registerIndex].value
+        }
+    }
+
+    static forJumpToAddress(address)
+    {
+        return async function(executionContext)
+        {
+            executionContext.instructionPointer = address
         }
     }
 }
@@ -231,6 +239,7 @@ export class Thread
             this.executionContext.instructionPointer = instruction.lineNumber + 1
             console.log(`\n>> Executing instruction ${instruction.lineNumber}: ${instruction.text}`)
             await instruction.thunk(this.executionContext)    
+            process.stdout.write('\x1b[2m')
             console.log(`stack:`)
             if(this.executionContext.stack.length > 0)
             {
@@ -247,6 +256,7 @@ export class Thread
                 let element = registers[registerIndex]
                 console.log(`R${registerIndex} : ${element.value} (${element.helpfulName})`)
             }
+            process.stdout.write('\x1b[0m')
         }
         else
         {
