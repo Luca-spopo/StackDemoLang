@@ -49,7 +49,7 @@ body
 define_procedure average_of_3
 contract
 {
-    I promise to pop 4 elements (two numbers to average, return address) and push 1 element (their average) on the stack
+    I promise to pop 4 elements (the numbers to average, return address) and push 1 element (their average) on the stack
     I promise to preserve the value of all registers except: registers[0], registers[1], registers[2]
 }
 body
