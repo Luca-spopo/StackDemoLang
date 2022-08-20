@@ -48,6 +48,7 @@ class Procedure
 {
     constructor(name, address)
     {
+        this.instructions = []
         this.contracts = []
         this.name = name
         this.address = address
@@ -153,6 +154,7 @@ export default class StackDemoLangTranspilingVisitor
         let address = ctx.getAddress()
         let procedure = new Procedure(name, address)
         procedure.contracts = contracts
+        procedure.instructions = instructions
         return [procedure, instructions]
     }
 

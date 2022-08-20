@@ -2,7 +2,7 @@ import antlr4 from 'antlr4';
 import StackDemoLangLexer from './codegen/StackDemoLangLexer.js';
 import StackDemoLangParser from './codegen/StackDemoLangParser.js';
 import StackDemoLangTranspilingVisitor from './semantics.js';
-import { ExecutionContext, HiddenCallStackFrame, Thread } from './interpreter.js';
+import { ExecutionContext, HiddenCallStackFrame, Core } from './interpreter.js';
 import { showUserOutput } from './io.js';
 import inspect from 'browser-util-inspect'
 
@@ -30,7 +30,7 @@ export async function runProgram(input)
         let executionContext = new ExecutionContext(8)
         executionContext.instructionPointer = mainProcedure.address
         executionContext.hiddenCallStack.push(new HiddenCallStackFrame(mainProcedure))
-        let mainThread = new Thread(program, executionContext)
+        let mainThread = new Core(program, executionContext)
         while(true)
         {
             await mainThread.tick()

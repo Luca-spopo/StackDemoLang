@@ -2,6 +2,17 @@ import { showUserOutput, getUserInput, dimOutput, resetOutputFormat } from "./io
 
 const DONT_CARE = {}
 
+export class ExecutionContextState
+{
+    constructor(instructionPointer, registers, stack, hiddenCallStack)
+    {
+        self.instructionPointer = instructionPointer
+        self.registers = registers.slice(0)
+        self.stack = stack.slice(0)
+        self.hiddenCallStack = hiddenCallStack.slice(0)
+    }
+}
+
 export class ExecutionContext
 {
     constructor(registerCount)
@@ -14,8 +25,16 @@ export class ExecutionContext
         this.registerCount = registerCount
         this.stack = []
         this.hiddenCallStack = []
+        this.previousStates = []
         this.instructionPointer = 0
+        this.id = Math.floor(Math.random()*999)
     }
+
+    saveState()
+    {
+        self.previousStates.push(new ExecutionContextState(self.instructionPointer, self.registers, self.stack, self.hiddenCallStack))
+    }
+
     startUndefinedBehavior(reason)
     {
         //TODO: Make UI have warnings about UB, along with the reason
@@ -96,37 +115,37 @@ class RegisterInvariant extends Invariant
 }
 
 
-const _latestProcedure = function(executionContext)
+const _latestInvocation = function(executionContext)
 {
-    return executionContext.hiddenCallStack.at(-1).procedure
+    return executionContext.hiddenCallStack.at(-1)
 }
 
 const _addThunk = async function(executionContext)
 {
     let rhs = executionContext.stack.pop().value
     let lhs = executionContext.stack.pop().value
-    executionContext.stack.push(new StackElement(lhs + rhs, "add_operation_result", _latestProcedure(executionContext)))
+    executionContext.stack.push(new StackElement(lhs + rhs, "add_operation_result", _latestInvocation(executionContext)))
 }
 
 const _subtractThunk = async function(executionContext)
 {
     let rhs = executionContext.stack.pop().value
     let lhs = executionContext.stack.pop().value
-    executionContext.stack.push(new StackElement(lhs - rhs, "add_operation_result", _latestProcedure(executionContext)))
+    executionContext.stack.push(new StackElement(lhs - rhs, "add_operation_result", _latestInvocation(executionContext)))
 }
 
 const _multiplyThunk = async function(executionContext)
 {
     let rhs = executionContext.stack.pop().value
     let lhs = executionContext.stack.pop().value
-    executionContext.stack.push(new StackElement(lhs * rhs, "add_operation_result", _latestProcedure(executionContext)))
+    executionContext.stack.push(new StackElement(lhs * rhs, "add_operation_result", _latestInvocation(executionContext)))
 }
 
 const _divideThunk = async function(executionContext)
 {
     let rhs = executionContext.stack.pop().value
     let lhs = executionContext.stack.pop().value
-    executionContext.stack.push(new StackElement(parseInt(lhs / rhs), "add_operation_result", _latestProcedure(executionContext)))
+    executionContext.stack.push(new StackElement(parseInt(lhs / rhs), "add_operation_result", _latestInvocation(executionContext)))
 }
 
 const _inputThunk = async function(executionContext)
@@ -135,7 +154,7 @@ const _inputThunk = async function(executionContext)
     while(isNaN(inputInteger) || inputInteger < 0) {
         inputInteger = parseInt(await getUserInput("Please enter a whole number"))
     }
-    executionContext.stack.push(new StackElement(inputInteger, "user_input", _latestProcedure(executionContext)))
+    executionContext.stack.push(new StackElement(inputInteger, "user_input", _latestInvocation(executionContext)))
 }
 
 export class ThunkGenerators
@@ -147,12 +166,12 @@ export class ThunkGenerators
             let stackElement = executionContext.stack.pop()
             if(stackElement)
             {
-                executionContext.registers[registerIndex] = new RegisterElement(stackElement.value, helpfulName, _latestProcedure(executionContext))
+                executionContext.registers[registerIndex] = new RegisterElement(stackElement.value, helpfulName, _latestInvocation(executionContext))
             }
             else
             {
                 executionContext.startUndefinedBehavior("Reached the bottom of the stack")
-                executionContext.registers[registerIndex] = new RegisterElement(Math.floor(Math.random() * 65025), helpfulName, _latestProcedure(executionContext))
+                executionContext.registers[registerIndex] = new RegisterElement(Math.floor(Math.random() * 65025), helpfulName, _latestInvocation(executionContext))
             }
         }
     }
@@ -161,7 +180,7 @@ export class ThunkGenerators
     {
         return async function(executionContext)
         {
-            executionContext.stack.push(new StackElement(executionContext.registers[registerIndex].value, helpfulName, _latestProcedure(executionContext)))
+            executionContext.stack.push(new StackElement(executionContext.registers[registerIndex].value, helpfulName, _latestInvocation(executionContext)))
         }
     }
 
@@ -169,7 +188,7 @@ export class ThunkGenerators
     {
         return async function(executionContext)
         {
-            executionContext.stack.push(new StackElement(parseInt(value), helpfulName, _latestProcedure(executionContext)))
+            executionContext.stack.push(new StackElement(parseInt(value), helpfulName, _latestInvocation(executionContext)))
         }
     }
 
@@ -224,7 +243,7 @@ export class ThunkGenerators
     }
 }
 
-export class Thread
+export class Core
 {
     constructor(program, executionContext)
     {
