@@ -32,7 +32,7 @@ export class ProgramVisualizer
         for(let procedure_index in vm.program.procedures)
         {
             let procedure = vm.program.procedures[procedure_index]
-            let procedureColor = hash(procedure.name)%360         
+            let procedureColor = (procedure_index*80)%360         
             let baseRect = new fabric.Rect({
                 left: 0,
                 rx: 18, ry: 18,
