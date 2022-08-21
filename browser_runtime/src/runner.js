@@ -2,11 +2,11 @@ import antlr4 from 'antlr4';
 import StackDemoLangLexer from './codegen/StackDemoLangLexer.js';
 import StackDemoLangParser from './codegen/StackDemoLangParser.js';
 import StackDemoLangTranspilingVisitor from './semantics.js';
-import { ExecutionContext, HiddenCallStackFrame, Core } from './interpreter.js';
+import { ExecutionContext, HiddenCallStackFrame, VM } from './interpreter.js';
 import { showUserOutput } from './io.js';
 import inspect from 'browser-util-inspect'
 
-export async function runProgram(input)
+export function runProgram(input, programVisualizer)
 {
     console.log("Parsing program...")
     let programLines = input.split("\n")
@@ -30,11 +30,15 @@ export async function runProgram(input)
         let executionContext = new ExecutionContext(8)
         executionContext.instructionPointer = mainProcedure.address
         executionContext.hiddenCallStack.push(new HiddenCallStackFrame(mainProcedure))
-        let mainThread = new Core(program, executionContext)
-        while(true)
-        {
-            await mainThread.tick()
+        let vm = new VM(program, executionContext)
+
+        if (programVisualizer) {
+            programVisualizer.visualizeProgram(vm)
         }
+
+        setInterval(() => {
+            vm.tick()
+        }, 1)
     }
     else
     {

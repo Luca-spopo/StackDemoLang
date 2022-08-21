@@ -243,7 +243,7 @@ export class ThunkGenerators
     }
 }
 
-export class Core
+export class VM
 {
     constructor(program, executionContext)
     {
