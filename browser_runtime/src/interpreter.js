@@ -6,10 +6,10 @@ export class ExecutionContextState
 {
     constructor(instructionPointer, registers, stack, hiddenCallStack)
     {
-        self.instructionPointer = instructionPointer
-        self.registers = registers.slice(0)
-        self.stack = stack.slice(0)
-        self.hiddenCallStack = hiddenCallStack.slice(0)
+        this.instructionPointer = instructionPointer
+        this.registers = registers.slice(0)
+        this.stack = stack.slice(0)
+        this.hiddenCallStack = hiddenCallStack.slice(0)
     }
 }
 
@@ -32,7 +32,7 @@ export class ExecutionContext
 
     saveState()
     {
-        self.previousStates.push(new ExecutionContextState(self.instructionPointer, self.registers, self.stack, self.hiddenCallStack))
+        this.previousStates.push(new ExecutionContextState(this.instructionPointer, this.registers, this.stack, this.hiddenCallStack))
     }
 
     startUndefinedBehavior(reason)
@@ -252,6 +252,7 @@ export class Core
     }
     async tick()
     {
+        this.executionContext.saveState()
         let instruction = this.program.instructionAt(this.executionContext.instructionPointer)
         if(instruction)
         {

@@ -69,3 +69,7 @@ The way to debug the semantic parser and interpreter, is to debug via nodeJS + c
 antlr4 -Dlanguage=JavaScript ./StackDemoLang.g4 -o browser_runtime/src/codegen
 ( cd browser_runtime ; node --inspect-brk . )
 ```
+
+
+TODO: FabricJS and/or OpenSeaDragon for rendering
+figma has concept diagrams
