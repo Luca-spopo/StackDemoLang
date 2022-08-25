@@ -21,8 +21,16 @@ export class ProgramVisualizer
         this.instructionObjects = {}
     }
 
-    update() {
-
+    updateInstructionPointer() {
+        let vm = this.vm
+        if(this.lastHighlightedInstruction)
+        {
+            this.lastHighlightedInstruction.item(1).set({"fill": `black`})
+        }
+        let instructionToExecute = vm.program.instructionAt(vm.executionContext.instructionPointer)
+        let ins = this.instructionObjects[instructionToExecute.lineNumber]
+        this.lastHighlightedInstruction = ins
+        ins.item(1).set({"fill": `hsl(${vm.executionContext.id % 360}, 80%, 30%)`})
     }
 
     runVM(vm) {
@@ -40,16 +48,9 @@ export class ProgramVisualizer
 
         //Enable playing next instruction
         this.canvas.on('mouse:down', async () => {
-            if(this.lastHighlightedInstruction)
-            {
-                this.lastHighlightedInstruction.item(1).set({"fill": `black`})
-            }
-            let instructionToExecute = vm.program.instructionAt(vm.executionContext.instructionPointer)
-            let ins = this.instructionObjects[instructionToExecute.lineNumber]
-            this.lastHighlightedInstruction = ins
-            ins.item(1).set({"fill": `hsl(${vm.executionContext.id % 360}, 80%, 30%)`})
+            this.updateInstructionPointer()
             this.canvas.requestRenderAll()
-            setTimeout(async () => { await vm.tick() }, 10)
+            setTimeout(async () => { await vm.tick() }, 100)
         })
 
         var procedureOffset = 30
