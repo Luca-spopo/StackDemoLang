@@ -126,26 +126,33 @@ export class ProgramVisualizer
         //Second pass, to set up arrows for jump instructions
         
         let temp = this.procedureObjects[Object.keys(this.procedureObjects)[0]]
-        var JUMPLINE_X = temp.left + temp.width
+        var JUMPLINE_X = temp.left + temp.width + 12
 
         for(let instruction of vm.program.instructions)
         {
-            if (instruction.visualizationInfo.jump) {
-                JUMPLINE_X += 10
-
+            let jumpInfo = instruction.visualizationInfo.jump
+            if (jumpInfo) {
                 let sourceLineNumber = instruction.lineNumber
-                var destLineNumber = parseInt(instruction.visualizationInfo.jump)
+                var destLineNumber = parseInt(jumpInfo)
                 let sourceInstructionObject = this.instructionObjects[sourceLineNumber]
                 let sourcePosition = fabric.util.transformPoint({x: sourceInstructionObject.width/2  + 50, y: sourceInstructionObject.height/2}, sourceInstructionObject.calcTransformMatrix())
                 if(destLineNumber)
                 {
+                    JUMPLINE_X += 10
                     destLineNumber = vm.program.instructionAt(destLineNumber).lineNumber
                     let destInstructionObject = this.instructionObjects[destLineNumber]
                     let destPosition = fabric.util.transformPoint({x: destInstructionObject.width/2 + 50, y: -destInstructionObject.height/2}, destInstructionObject.calcTransformMatrix())
 
                     let path = new fabric.Path(`M ${sourcePosition.x} ${sourcePosition.y} L ${JUMPLINE_X} ${sourcePosition.y} L ${JUMPLINE_X} ${destPosition.y}  L ${destPosition.x} ${destPosition.y} l 5 5 m -5 -5 l 5 -5`)
-                    path.set({fill: "transparent", stroke: "black", opacity: "0.3"})
+                    path.set({fill: "transparent", stroke: "black", opacity: 0.3})
                     this.canvas.add(path)
+                }
+                else if(typeof(jumpInfo) == "string" && jumpInfo.startsWith("R_")) {
+                    let path = new fabric.Path(`M ${sourcePosition.x} ${sourcePosition.y} L ${temp.left + temp.width + 10} ${sourcePosition.y} l -5 -5 m 5 5 l -5 5`)
+                    let questionMark = new fabric.Text("?", {left: temp.left + temp.width + 10, top: sourcePosition.y - 14, fontSize: 14, fontFamily: 'Helvetica', opacity: 0.3})
+                    path.set({fill: "transparent", stroke: "black", opacity: 0.3})
+                    this.canvas.add(path)
+                    this.canvas.add(questionMark)
                 }
             }
         }
