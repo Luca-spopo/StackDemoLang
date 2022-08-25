@@ -25,7 +25,7 @@ export class ProgramVisualizer
 
     }
 
-    visualizeProgram(vm) {
+    runVM(vm) {
         this.canvas = new fabric.Canvas('program_canvas')
         this.vm = vm
 
@@ -36,6 +36,20 @@ export class ProgramVisualizer
             vpt[5] -= e.deltaY;
             this.setViewportTransform(vpt)
             this.requestRenderAll();
+        })
+
+        //Enable playing next instruction
+        this.canvas.on('mouse:down', async () => {
+            if(this.lastHighlightedInstruction)
+            {
+                this.lastHighlightedInstruction.item(1).set({"fill": `black`})
+            }
+            let instructionToExecute = vm.program.instructionAt(vm.executionContext.instructionPointer)
+            let ins = this.instructionObjects[instructionToExecute.lineNumber]
+            this.lastHighlightedInstruction = ins
+            ins.item(1).set({"fill": `hsl(${vm.executionContext.id % 360}, 80%, 30%)`})
+            this.canvas.requestRenderAll()
+            setTimeout(async () => { await vm.tick() }, 10)
         })
 
         var procedureOffset = 30

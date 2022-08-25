@@ -1,4 +1,4 @@
-import { runProgram } from "./runner.js"
+import { loadVM } from "./runner.js"
 import { ProgramVisualizer } from "./visualization/default_visualizer.js"
 
 window.runProgramInCodeTextArea = () => {
@@ -7,6 +7,6 @@ window.runProgramInCodeTextArea = () => {
     document.getElementById("runButton").remove()
     document.getElementById("program_canvas").style.display = "initial"
     setTimeout(() => {
-        runProgram(program, new ProgramVisualizer())
+        new ProgramVisualizer().runVM(loadVM(program))
     }, 1)
 }
