@@ -3,11 +3,12 @@ import { ThunkGenerators } from './interpreter.js';
 
 class Instruction
 {
-    constructor(lineNumber, text, thunk)
+    constructor(lineNumber, text, thunk, visualizationInfo)
     {
         this.lineNumber = lineNumber
         this.text = text
         this.thunk = thunk
+        this.visualizationInfo = visualizationInfo
     }
 }
 
@@ -243,6 +244,7 @@ export default class StackDemoLangTranspilingVisitor
     {
         var thunk = null
         var representativeText = simpleStatementCtx.start.getInputStream().getText(simpleStatementCtx.start.start, simpleStatementCtx.stop.stop)
+        var visualizationInfo = {}
 
         {
             let ctx = simpleStatementCtx.push_statement()
@@ -347,6 +349,7 @@ export default class StackDemoLangTranspilingVisitor
                 let registerArgCtx = ctx.register_arg()
                 let registerIndex = this.getRegisterIndexFromRegisterArg(registerArgCtx)
                 thunk = ThunkGenerators.forJumpToRegister(registerIndex)
+                visualizationInfo = {"jump":"R_"+registerIndex}
             }
         }
 
@@ -358,9 +361,10 @@ export default class StackDemoLangTranspilingVisitor
                 let address = labelArgCtx.resolveAddress(programContext, procedureContext)
                 thunk = ThunkGenerators.forJumpToAddress(address)
                 representativeText = `jump to (${address}) //${labelArgCtx.getText()}`
+                visualizationInfo = {"jump":address}
             }
         }
 
-        return new Instruction(simpleStatementCtx.start.line, representativeText, thunk)
+        return new Instruction(simpleStatementCtx.start.line, representativeText, thunk, visualizationInfo)
     }
 }

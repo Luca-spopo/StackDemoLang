@@ -17,7 +17,8 @@ export class ProgramVisualizer
     {
         this.canvas = null
         this.vm = null
-        this.procedures = {}
+        this.procedureObjects = {}
+        this.instructionObjects = {}
     }
 
     update() {
@@ -27,6 +28,15 @@ export class ProgramVisualizer
     visualizeProgram(vm) {
         this.canvas = new fabric.Canvas('program_canvas')
         this.vm = vm
+
+        //Enable panning
+        this.canvas.on('mouse:wheel', function(opt) {
+            var e = opt.e;
+            var vpt = this.viewportTransform;
+            vpt[5] -= e.deltaY;
+            this.setViewportTransform(vpt)
+            this.requestRenderAll();
+        })
 
         var procedureOffset = 30
         for(let procedure_index in vm.program.procedures)
@@ -72,7 +82,6 @@ export class ProgramVisualizer
 
             for(let instruction_index in procedure.instructions)
             {
-                console.log("LUCA: "+instruction_index)
                 let instruction = procedure.instructions[instruction_index]
                 let lineNumberText = new fabric.Text(instruction.lineNumber.toString(), {
                     fontSize: 12,
@@ -92,6 +101,8 @@ export class ProgramVisualizer
                     left: 5,
                 })
 
+                this.instructionObjects[instruction.lineNumber] = singleInstructionGroup
+
                 instructionsList.push(singleInstructionGroup)
             }
 
@@ -105,11 +116,38 @@ export class ProgramVisualizer
                 top: procedureOffset
             })
 
-            this.procedures[procedure.name] = procedureGroup
+            this.procedureObjects[procedure.name] = procedureGroup
               
             this.canvas.add(procedureGroup)
 
             procedureOffset += 30 + procedureGroup.height
+        }
+
+        //Second pass, to set up arrows for jump instructions
+        
+        let temp = this.procedureObjects[Object.keys(this.procedureObjects)[0]]
+        var JUMPLINE_X = temp.left + temp.width
+
+        for(let instruction of vm.program.instructions)
+        {
+            if (instruction.visualizationInfo.jump) {
+                JUMPLINE_X += 10
+
+                let sourceLineNumber = instruction.lineNumber
+                var destLineNumber = parseInt(instruction.visualizationInfo.jump)
+                let sourceInstructionObject = this.instructionObjects[sourceLineNumber]
+                let sourcePosition = fabric.util.transformPoint({x: sourceInstructionObject.width/2  + 50, y: sourceInstructionObject.height/2}, sourceInstructionObject.calcTransformMatrix())
+                if(destLineNumber)
+                {
+                    destLineNumber = vm.program.instructionAt(destLineNumber).lineNumber
+                    let destInstructionObject = this.instructionObjects[destLineNumber]
+                    let destPosition = fabric.util.transformPoint({x: destInstructionObject.width/2 + 50, y: -destInstructionObject.height/2}, destInstructionObject.calcTransformMatrix())
+
+                    let path = new fabric.Path(`M ${sourcePosition.x} ${sourcePosition.y} L ${JUMPLINE_X} ${sourcePosition.y} L ${JUMPLINE_X} ${destPosition.y}  L ${destPosition.x} ${destPosition.y} l 5 5 m -5 -5 l 5 -5`)
+                    path.set({fill: "transparent", stroke: "black", opacity: "0.3"})
+                    this.canvas.add(path)
+                }
+            }
         }
     }
 }
