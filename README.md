@@ -53,6 +53,18 @@ antlr4 -Dlanguage=JavaScript ./StackDemoLang.g4 -o browser_runtime/src/codegen
 ( cd browser_runtime ; npm install ; node . )
 ```
 
+## Docker
+
+The Dockerfile is provided in the root directory can be used to generate the browser based html runtime
+```shell
+docker build . -t stackdemolang
+docker run -i -v "$PWD/examples":/examples stackdemolang /examples/average_of_3.stackdemo
+```
+
+## CI/CD
+
+Pushing to the `main` git branch on github deploys github-actions and makes the demo application available on `anirudh.katoch.co/StackDemoLang`
+
 # Debugging
 
 Easiest way to debug the grammar is using the antlr test rig
@@ -69,7 +81,3 @@ The way to debug the semantic parser and interpreter, is to debug via nodeJS + c
 antlr4 -Dlanguage=JavaScript ./StackDemoLang.g4 -o browser_runtime/src/codegen
 ( cd browser_runtime ; node --inspect-brk . )
 ```
-
-
-TODO: FabricJS and/or OpenSeaDragon for rendering
-figma has concept diagrams
