@@ -308,6 +308,24 @@ export default class StackDemoLangTranspilingVisitor {
             }
         }
 
+
+        {
+            let ctx = simpleStatementCtx.jump_nonzero_to_label_statement()
+            if (ctx != null) {
+                let labelArgCtx = ctx.labelled_address_arg()
+                let registerArgCtx = ctx.register_arg()
+                let nonEqualValue = ctx.WHOLE_NUMBER()
+                let address = labelArgCtx.resolveAddress(programContext, procedureContext)
+                let registerIndex = this.getRegisterIndexFromRegisterArg(registerArgCtx)
+                thunk = ThunkGenerators.forJumpNotZeroToAddress(registerIndex, nonEqualValue, address)
+                representativeText = `if registers[${registerIndex}] != ${nonEqualValue} jump to (${address}) //${labelArgCtx.getText()}`
+                visualizationInfo = {
+                    "jump": address,
+                    "jump_is_conditional": true
+                }
+            }
+        }
+
         return new Instruction(simpleStatementCtx.start.line, representativeText, thunk, visualizationInfo)
     }
 }

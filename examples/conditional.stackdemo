@@ -1,0 +1,17 @@
+//Shows a conditional jump
+
+define_procedure main
+body
+{
+    input
+    registers[0] = stack.pop() (as iterations)
+
+    #LABEL: .loopStart
+ 
+    stack.push(registers[0]) (as remaining_iterations)
+    stack.push(1) (as decrement)
+    subtract
+    registers[0] = stack.pop() (as iterations)
+
+    if registers[0] != 0 jump to #.loopStart.lineNumber
+}

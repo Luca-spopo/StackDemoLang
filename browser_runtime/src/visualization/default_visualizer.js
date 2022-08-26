@@ -302,6 +302,11 @@ export class ProgramVisualizer {
                         stroke: "black",
                         opacity: 0.3
                     })
+                    if (instruction.visualizationInfo.jump_is_conditional) {
+                        path.set({
+                            strokeDashArray: [5, 5]
+                        })
+                    }
                     this.canvas.add(path)
                 } else if (typeof(jumpInfo) == "string" && jumpInfo.startsWith("R_")) {
                     let path = new fabric.Path(`M ${sourcePosition.x} ${sourcePosition.y} L ${temp.left + temp.width + 10} ${sourcePosition.y} l -5 -5 m 5 5 l -5 5`)

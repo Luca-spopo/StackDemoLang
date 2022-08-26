@@ -71,12 +71,7 @@ elements
     ;
 
 statement
-    : compound_statement
-    | simple_statement
-    ;
-
-compound_statement
-    : if_statement
+    : simple_statement
     ;
 
 directive
@@ -86,10 +81,6 @@ directive
 
 label_declaration
     : '#' 'LABEL:' DOT WORD
-    ;
-
-if_statement
-    : 'if' ZERO '==' register_arg block ('else' (block | if_statement))?
     ;
 
 block
@@ -109,6 +100,7 @@ simple_statement
     | print_statement
     | jump_to_register_statement
     | jump_to_label_statement
+    | jump_nonzero_to_label_statement
     ;
 
 push_from_statement
@@ -157,6 +149,10 @@ jump_to_register_statement
 
 jump_to_label_statement
     : 'jump to' labelled_address_arg
+    ;
+
+jump_nonzero_to_label_statement
+    : 'if' register_arg '!=' WHOLE_NUMBER 'jump to' labelled_address_arg
     ;
 
 labelled_address_arg

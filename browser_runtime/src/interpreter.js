@@ -197,6 +197,14 @@ export class ThunkGenerators {
             executionContext.instructionPointer = address
         }
     }
+
+    static forJumpNotZeroToAddress(registerIndex, nonEqualValue, address) {
+        return async function(executionContext) {
+            if (executionContext.registers[registerIndex].value != nonEqualValue) {
+                executionContext.instructionPointer = address
+            }
+        }
+    }
 }
 
 export class VM {
