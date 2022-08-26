@@ -1,5 +1,9 @@
-import { loadVM } from "./runner.js"
-import { ProgramVisualizer } from "./visualization/default_visualizer.js"
+import {
+    loadVM
+} from "./runner.js"
+import {
+    ProgramVisualizer
+} from "./visualization/default_visualizer.js"
 
 window.runProgramInCodeTextArea = () => {
     let program = document.getElementById("codeTextArea").value
