@@ -7,4 +7,4 @@ COPY browser_runtime/ browser_runtime/
 COPY --from=ANTLR4 /browser_runtime/src/codegen browser_runtime/src/codegen
 WORKDIR browser_runtime
 RUN npm install && npx webpack
-ENTRY ["node", "."]
+ENTRYPOINT ["node", "."]
