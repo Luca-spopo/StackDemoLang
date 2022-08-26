@@ -24,8 +24,8 @@ jobs:
 
     - name: Build
       run: |
-        sudo apt install antlr4
-        antlr4 -Dlanguage=JavaScript ./StackDemoLang.g4 -o browser_runtime/src/codegen
+        curl -O http://www.antlr.org/download/antlr-4.5-complete.jar
+        java -Xmx500M -cp "/usr/local/lib/antlr-4.5-complete.jar:$CLASSPATH" org.antlr.v4.Tool -Dlanguage=JavaScript ./StackDemoLang.g4 -o browser_runtime/src/codegen
         cd browser_runtime
         npm install
         npx webpack
