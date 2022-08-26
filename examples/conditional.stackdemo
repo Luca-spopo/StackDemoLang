@@ -14,4 +14,6 @@ body
     registers[0] = stack.pop() (as iterations)
 
     if registers[0] != 0 jump to #.loopStart.lineNumber
+
+    print registers[0] (as finished_iterating)
 }
