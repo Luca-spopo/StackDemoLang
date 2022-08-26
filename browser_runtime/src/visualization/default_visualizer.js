@@ -103,10 +103,17 @@ export class ProgramVisualizer {
         ////
 
 
+        let instructionPosition = fabric.util.transformPoint({
+            x: 0,
+            y: ins.height / 2
+        }, ins.calcTransformMatrix())
+
         if (this.executionContextGroup) {
             this.canvas.remove(this.executionContextGroup)
         }
-        this.executionContextGroup = new fabric.Group([executionContextObject, executionContextArrow, registerStaticText, stackStaticText, stackbox, stackboxText1, stackboxText2, stackboxArrows, ...registerLabels])
+        this.executionContextGroup = new fabric.Group([executionContextObject, executionContextArrow, registerStaticText, stackStaticText, stackbox, stackboxText1, stackboxText2, stackboxArrows, ...registerLabels], 
+            {originY: "center", left: 10, top: instructionPosition.y})
+
         this.canvas.add(this.executionContextGroup)
     }
 
@@ -202,7 +209,7 @@ export class ProgramVisualizer {
             })
 
             let procedureGroup = new fabric.Group([baseRect, nameRect, nameText, instructionsGroup], {
-                left: 100,
+                left: 430,
                 top: procedureOffset
             })
 
