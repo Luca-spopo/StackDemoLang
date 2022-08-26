@@ -12,27 +12,26 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [16.x]
+        node-version: [12.x, 14.x, 16.x]
     
     steps:
-      - uses: actions/checkout@v2
-      - name: Build Docker Image
-        uses: docker/build-push-action@v1
-        with:
-          repository: my-example-image
-          tags: latest
-      - uses: shrink/actions-docker-extract@v1
-        id: extract
-        with:
-          image: my-example-image
-          path: /browser_runtime/dist
-      - name: Upload Dist
-        uses: actions/upload-artifact@v2
-        with:
-          path: ${{ steps.extract.outputs.destination }}
-          name: dist
-      - name: 🚀 deploy
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
+    - uses: actions/checkout@v3
+
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - name: Build
+      run: |
+        sudo apt install antlr4
+        antlr4 -Dlanguage=JavaScript ./StackDemoLang.g4 -o browser_runtime/src/codegen
+        cd browser_runtime
+        npm install
+        npx webpack
+        
+    - name: 🚀 deploy
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./browser_runtime/dist
