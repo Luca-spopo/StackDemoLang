@@ -1,0 +1,14 @@
+/*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
+
+/*! https://mths.be/codepointat v0.2.0 by @mathias */
+
+/*! https://mths.be/fromcodepoint v0.2.1 by @mathias */
+
+/**
+ * Echos the value of a value. Trys to print the value out
+ * in the best way possible given the different types.
+ *
+ * @param {Object} obj The object to print out.
+ * @param {Object} opts Optional options object that alters the output.
+ * @license MIT (© Joyent)
+ */
