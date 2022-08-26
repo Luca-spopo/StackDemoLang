@@ -24,8 +24,8 @@ jobs:
 
     - name: Build
       run: |
-        curl -O http://www.antlr.org/download/antlr-4.5-complete.jar
-        java -Xmx500M -cp "/usr/local/lib/antlr-4.5-complete.jar:$CLASSPATH" org.antlr.v4.Tool -Dlanguage=JavaScript ./StackDemoLang.g4 -o browser_runtime/src/codegen
+        curl -O /usr/local/lib/antlr.jar https://github.com/antlr/website-antlr4/raw/gh-pages/download/antlr-4.10.1-complete.jar
+        java -Xmx500M -cp "/usr/local/lib/antlr.jar:$CLASSPATH" org.antlr.v4.Tool -Dlanguage=JavaScript ./StackDemoLang.g4 -o browser_runtime/src/codegen
         cd browser_runtime
         npm install
         npx webpack
