@@ -7,13 +7,12 @@
    <body>
     <script src="main.js"></script>
     <textarea id="codeTextArea" style="height: 80vh; width: 80vh;">
-
-//Shows math operations, some stack usage, and subprocedure call
+      //Shows math operations, some stack usage, and subprocedure call
 
 define_procedure sum_of_3
 contract
 {
-    I promise to pop 4 elements (two numbers to sum, return address) and push 1 element (their sum) on the stack
+    I promise to pop 4 elements (three numbers to sum, return address) and push 1 element (their sum) on the stack
     I promise to preserve the value of all registers except: registers[0], registers[1], registers[2]
 }
 body
@@ -59,7 +58,7 @@ body
 define_procedure average_of_3
 contract
 {
-    I promise to pop 4 elements (the numbers to average, return address) and push 1 element (their average) on the stack
+    I promise to pop 4 elements (three numbers to average, return address) and push 1 element (their average) on the stack
     I promise to preserve the value of all registers except: registers[0], registers[1], registers[2]
 }
 body
@@ -141,7 +140,6 @@ body
     jump to #.loopStart.lineNumber
     //Or alternatively, jump to #main.lineNumber
 }
-
     </textarea>
       <br>
     <button onclick="runProgramInCodeTextArea()" id="runButton">
