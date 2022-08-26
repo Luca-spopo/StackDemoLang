@@ -52,19 +52,38 @@ export class ProgramVisualizer {
         let executionContextArrow = new fabric.Path(`M ${executionContextObject.width+30} ${executionContextObject.height/2} l -30 -20 l 0 40 z`, {
             fill: executionContextColor
         })
-        let registerStaticText = new fabric.Text("Registers", {top: 44, left: 45, fontSize: 16, fontWeight: 'bold'})
-        let stackStaticText = new fabric.Text("Stack", {top: 44, left: 260, fontSize: 16, fontWeight: 'bold'})
+        let registerStaticText = new fabric.Text("Registers", {
+            top: 44,
+            left: 45,
+            fontSize: 16,
+            fontWeight: 'bold'
+        })
+        let stackStaticText = new fabric.Text("Stack", {
+            top: 44,
+            left: 260,
+            fontSize: 16,
+            fontWeight: 'bold'
+        })
         var registerLabels = []
 
-        for(let register_index in vm.executionContext.registers)
-        {
+        for (let register_index in vm.executionContext.registers) {
             let register = vm.executionContext.registers[register_index]
-            registerLabels.push(new fabric.Text(`R${register_index}:`, {top: 74 + register_index*25, left: 16, fontSize: 15, fontWeight: 'light'}))
+            registerLabels.push(new fabric.Text(`R${register_index}:`, {
+                top: 74 + register_index * 25,
+                left: 16,
+                fontSize: 15,
+                fontWeight: 'light'
+            }))
 
-            let registerValue = new fabric.Text(`${register.value} (${register.helpfulName})`, {top: 74 + register_index*25, left: 30, fontSize: 12})
-            if(register.responsibleProcedureInvocation)
-            {
-                registerValue.set({textBackgroundColor: `hsl(${register.responsibleProcedureInvocation.invocationId % 360},20%,90%)`})
+            let registerValue = new fabric.Text(`${register.value} (${register.helpfulName})`, {
+                top: 74 + register_index * 25,
+                left: 30,
+                fontSize: 12
+            })
+            if (register.responsibleProcedureInvocation) {
+                registerValue.set({
+                    textBackgroundColor: `hsl(${register.responsibleProcedureInvocation.invocationId % 360},20%,90%)`
+                })
             }
             registerLabels.push(registerValue)
         }
@@ -77,25 +96,55 @@ export class ProgramVisualizer {
             width: 165,
             height: 237,
         })
-        let stackboxText1 = new fabric.Text("Towards 0x0000", {originX: 'center', originY:'center', textAlign: 'center', fill: executionContextColor, top: 73 + 237/2 - 20, left: 200+165/2, fontSize: 12, fontWeight: 'italic'})
-        let stackboxText2 = new fabric.Text("Towards higher memory\naddresses", {originX: 'center', originY:'center', fill: executionContextColor, textAlign: 'center', top: 73 + 237/2 + 30, left: 200+165/2, fontSize: 12, fontWeight: 'italic'})
+        let stackboxText1 = new fabric.Text("Towards 0x0000", {
+            originX: 'center',
+            originY: 'center',
+            textAlign: 'center',
+            fill: executionContextColor,
+            top: 73 + 237 / 2 - 20,
+            left: 200 + 165 / 2,
+            fontSize: 12,
+            fontWeight: 'italic'
+        })
+        let stackboxText2 = new fabric.Text("Towards higher memory\naddresses", {
+            originX: 'center',
+            originY: 'center',
+            fill: executionContextColor,
+            textAlign: 'center',
+            top: 73 + 237 / 2 + 30,
+            left: 200 + 165 / 2,
+            fontSize: 12,
+            fontWeight: 'italic'
+        })
         let stackboxArrows = new fabric.Path(`
         M 0 0 m 0 10 l 0 -20
         M 0 0 m 0 10 l -5 -5
         M 0 0 m 0 10 l 5 -5
         M 0 0 m 0 -10 l 5 5
         M 0 0 m 0 -10 l -5 5
-        `, {stroke: executionContextColor, originX: 'center', originY:'center', left: stackbox.left + stackbox.width/2, top: stackbox.top + stackbox.height/2})
+        `, {
+            stroke: executionContextColor,
+            originX: 'center',
+            originY: 'center',
+            left: stackbox.left + stackbox.width / 2,
+            top: stackbox.top + stackbox.height / 2
+        })
 
         //Draw stack values...
 
-        for(let stack_index in vm.executionContext.stack)
-        {
+        for (let stack_index in vm.executionContext.stack) {
             let stackElement = vm.executionContext.stack[stack_index]
-            let stackTextElement = new fabric.Text(`${stackElement.value} (${stackElement.helpfulName})`, {originX:"center", originY:"bottom", left: stackbox.left+stackbox.width/2, top: stackbox.top+stackbox.height-stack_index*20, fontSize: 12})
-            if(stackElement.responsibleProcedureInvocation)
-            {
-                stackTextElement.set({textBackgroundColor: `hsl(${stackElement.responsibleProcedureInvocation.invocationId % 360},20%,90%)`})
+            let stackTextElement = new fabric.Text(`${stackElement.value} (${stackElement.helpfulName})`, {
+                originX: "center",
+                originY: "bottom",
+                left: stackbox.left + stackbox.width / 2,
+                top: stackbox.top + stackbox.height - stack_index * 20,
+                fontSize: 12
+            })
+            if (stackElement.responsibleProcedureInvocation) {
+                stackTextElement.set({
+                    textBackgroundColor: `hsl(${stackElement.responsibleProcedureInvocation.invocationId % 360},20%,90%)`
+                })
             }
             registerLabels.push(stackTextElement)
         }
@@ -111,8 +160,11 @@ export class ProgramVisualizer {
         if (this.executionContextGroup) {
             this.canvas.remove(this.executionContextGroup)
         }
-        this.executionContextGroup = new fabric.Group([executionContextObject, executionContextArrow, registerStaticText, stackStaticText, stackbox, stackboxText1, stackboxText2, stackboxArrows, ...registerLabels], 
-            {originY: "center", left: 10, top: instructionPosition.y})
+        this.executionContextGroup = new fabric.Group([executionContextObject, executionContextArrow, registerStaticText, stackStaticText, stackbox, stackboxText1, stackboxText2, stackboxArrows, ...registerLabels], {
+            originY: "center",
+            left: 10,
+            top: instructionPosition.y
+        })
 
         this.canvas.add(this.executionContextGroup)
     }
