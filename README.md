@@ -1,5 +1,69 @@
 # StackDemoLang
-A language to demonstrate the stack and its workings
+
+Demo: https://anirudh.katoch.co/StackDemoLang
+(Hit Run, then keep clicking the page to move forward one instruction at a time)
+
+I learned programming by first learning a high level language and then much later learning about assembly and actual machine code that stuff compiles to.
+It was a steep learning curve for me and it took me a while to understand.
+StackDemoLang is a language which has the same principles as low level machine language / assembly.
+Hopefully it will help others learn stuff more quickly than I learned it
+
+- it has registers and a stack
+- it has jump instructions, no loops or if statements
+- it does not have "expressions"
+
+But it takes away the scary parts and makes things super easy to reason about
+- the jump addresses are just line numbers
+- calling conventions are stated via explicit "contracts", so we end up both demonstrating the need for and practical examples of calling conventions as part of procedure definition
+- We can give registers and stack values temporary names that show up during the visualization process
+- the VM that runs the code comes with visualization of the entire state and runs things one instruction at a time
+
+This makes it ideal for demonstration purposes or for learning how things work on the low level without having to worry about understanding the more arcane aspects of low level programming.
+
+For example, here's a valid program that calls a subroutine to average two numbers:
+```
+    //Average the numbers using a subroutine:
+        //Prepare the return address the subroutine should come back to after it's done:
+        stack.push(#.after_averaging_jump_here.lineNumber) (as address_to_return_to_after_procedure_call)
+
+        //Prepare the arguments (the numbers to average) for the subroutine
+        stack.push(registers[1]) (as number_to_add_1)
+        stack.push(registers[0]) (as number_to_add_2)
+
+        //Jump to the subroutine
+        jump to #average_of_2.lineNumber
+        #LABEL: .after_averaging_jump_here
+
+        //Process the output of the subroutine, which it left for us on the stack
+        registers[0] = stack.pop() (as average)
+```
+
+The calling convention is that we push two numbers and the return address to the stack.
+The subroutine itself explicitly states this calling convention (very verbosely):
+
+```
+define_procedure average_of_2
+contract
+{
+    I promise to pop 3 elements (the numbers to average and the return address) and push 1 element (their average) on the stack
+    I promise to preserve the value of all registers except: registers[0], registers[1]
+}
+body
+{
+    //Get the arguments (except the return address)
+    registers[0] = stack.pop() (as number_to_average_1)
+    registers[1] = stack.pop() (as number_to_average_2)
+    ...
+    ...
+}
+```
+
+This code is direclty picked up from `examples/average_of_2.stackdemo`
+(See the `examples` folder for more example programs)
+
+The program gets run and visualized by the visualizer one instruction at a time:
+
+![screenshot](img/example_visualizer.png)
 
 # The language
 
@@ -7,6 +71,8 @@ The language grammar is defined in StackDemoLang.g4, for use with ANTLR4
 https://github.com/antlr/antlr4
 
 Example programs are provided in the examples folder
+
+The reference for the language... I have not written yet, but the examples should get you started.
 
 # Lexing and parsing
 
